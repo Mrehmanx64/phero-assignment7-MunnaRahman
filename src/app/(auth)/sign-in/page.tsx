@@ -1,0 +1,188 @@
+"use client";
+
+import { authClient, signIn } from "@/lib/auth-client";
+import {
+  Button,
+  FieldError,
+  Form,
+  Input,
+  Label,
+  TextField,
+} from "@heroui/react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { FaGithub } from "react-icons/fa";
+import { FcGoogle } from "react-icons/fc";
+import { toast } from "react-toastify";
+
+export default function Basic() {
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const formData = new FormData(e.currentTarget);
+    const email = (formData.get("email") as string).trim();
+    const password = formData.get("password") as string;
+
+    try {
+      setIsLoading(true);
+
+      const { data, error } = await signIn.email({
+        email,
+        password,
+        callbackURL: "/",
+      });
+
+      if (error) {
+        toast.error(error.message || "সাইন ইন করা যায়নি!");
+        return;
+      }
+
+      console.log("Signin successful:", data);
+      toast.success("সফলভাবে সাইন ইন হয়েছে!");
+
+      router.push("/");
+      router.refresh();
+    } catch (error) {
+      console.error("Signin failed:", error);
+      toast.error("কিছু একটা সমস্যা হয়েছে। আবার চেষ্টা করুন!");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    try {
+      await authClient.signIn.social({
+        provider: "google",
+        callbackURL: "/",
+      });
+    } catch (error) {
+      console.error("Google sign-in failed:", error);
+      toast.error("Google দিয়ে সাইন ইন করা যায়নি!");
+    }
+  };
+
+  const handleGithubSignIn = async () => {
+    try {
+      await authClient.signIn.social({
+        provider: "github",
+        callbackURL: "/",
+      });
+    } catch (error) {
+      console.error("GitHub sign-in failed:", error);
+      toast.error("GitHub দিয়ে সাইন ইন করা যায়নি!");
+    }
+  };
+
+  return (
+    <Form
+      className="mx-auto my-6 flex w-full max-w-md flex-col space-y-6 px-4 sm:my-10"
+      onSubmit={onSubmit}
+    >
+      <div className="text-center mx-auto">
+        <h2 className="font-extrabold text-2xl">সাইন ইন</h2>
+        <p className="text-sm text-neutral-500">
+          বিস্তারিত দাম, বাজার তুলনা ও প্রোফাইল দেখতে অ্যাকাউন্টে ঢুকুন।
+        </p>
+      </div>
+
+      <div className="bg-white p-6 rounded-2xl space-y-4">
+        <TextField
+          isRequired
+          name="email"
+          type="email"
+          validate={(value) => {
+            if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(value)) {
+              return "Please enter a valid email address";
+            }
+            return null;
+          }}
+        >
+          <Label>ইমেইল</Label>
+          <Input
+            className="border border-gray-200 rounded-lg"
+            placeholder="you@example.com"
+          />
+          <FieldError />
+        </TextField>
+
+        <TextField
+          isRequired
+          minLength={8}
+          name="password"
+          type="password"
+          validate={(value) => {
+            if (value.length < 8) {
+              return "Password must be at least 8 characters";
+            }
+            if (!/[A-Z]/.test(value)) {
+              return "Password must contain at least one uppercase letter";
+            }
+            if (!/[0-9]/.test(value)) {
+              return "Password must contain at least one number";
+            }
+            return null;
+          }}
+        >
+          <Label>পাসওয়ার্ড</Label>
+          <Input
+            className="border border-gray-200 rounded-lg"
+            placeholder="কমপক্ষে ৮ অক্ষর"
+          />
+          <FieldError />
+        </TextField>
+
+        <div className="flex gap-2">
+          <Button
+            type="submit"
+            isDisabled={isLoading}
+            className="button button--md button--primary bg-primary w-full rounded-lg"
+          >
+            {isLoading ? "সাইন ইন হচ্ছে..." : "সাইন ইন"}
+          </Button>
+        </div>
+
+        <div className="flex w-full items-center gap-3 text-xs">
+          <hr className="h-0.5 min-w-0 flex-1 border-0 bg-gray-300" />
+          <span className="shrink-0">অথবা</span>
+          <hr className="h-0.5 min-w-0 flex-1 border-0 bg-gray-300" />
+        </div>
+
+        <div className="flex flex-col gap-3 sm:flex-row">
+          <button
+            type="button"
+            onClick={handleGoogleSignIn}
+            className="flex w-full items-center justify-center gap-1 rounded-lg border border-gray-200 px-3 py-2 text-xs font-bold sm:flex-1"
+          >
+            <FcGoogle className="shrink-0" />
+            Google দিয়ে চালিয়ে যান
+          </button>
+
+          <button
+            type="button"
+            onClick={handleGithubSignIn}
+            className="flex w-full items-center justify-center gap-1 rounded-lg border border-gray-200 px-3 py-2 text-xs font-bold sm:flex-1"
+          >
+            <FaGithub className="shrink-0" />
+            GitHub দিয়ে চালিয়ে যান
+          </button>
+        </div>
+
+        <div className="text-center text-sm">
+          অ্যাকাউন্ট নেই?{" "}
+          <Link href="/sign-up" className="text-red-600">
+            সাইন আপ করুন
+          </Link>
+        </div>
+      </div>
+
+      <Link href="/" className="text-center text-neutral-500 mb-5">
+        ← হোম পেজে ফিরে যান
+      </Link>
+    </Form>
+  );
+}
