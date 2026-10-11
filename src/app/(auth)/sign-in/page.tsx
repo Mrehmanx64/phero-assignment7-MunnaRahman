@@ -1,6 +1,6 @@
 "use client";
 
-import { authClient, signIn } from "@/lib/auth-client";
+import { authClient, signIn, useSession } from "@/lib/auth-client";
 import {
   Button,
   FieldError,
@@ -11,7 +11,7 @@ import {
 } from "@heroui/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FaGithub } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { toast } from "react-toastify";
@@ -19,6 +19,25 @@ import { toast } from "react-toastify";
 export default function Basic() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const { data: session, isPending } = useSession();
+
+  useEffect(() => {
+    if (!isPending && session?.user) {
+      router.push("/");
+    }
+  }, [session, isPending, router]);
+
+  if (isPending) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="h-12 w-12 animate-spin rounded-full border-4 border-gray-300 border-t-primary"></div>
+      </div>
+    );
+  }
+
+  if (session?.user) {
+    return null;
+  }
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
