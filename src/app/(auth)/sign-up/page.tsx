@@ -184,7 +184,7 @@ export default function Basic() {
           <Button
             type="submit"
             isDisabled={isLoading}
-            className="button button--md button--primary bg-primary w-full rounded-lg"
+            className="button button--md button--primary bg-primary w-full rounded-lg cursor-pointer transition-all hover:scale-105 active:scale-95"
           >
             {isLoading ? "অ্যাকাউন্ট তৈরি হচ্ছে..." : "অ্যাকাউন্ট তৈরি করুন"}
           </Button>
@@ -200,7 +200,7 @@ export default function Basic() {
           <button
             type="button"
             onClick={handleGoogleSignIn}
-            className="flex w-full items-center justify-center gap-2 rounded-lg border border-gray-200 px-3 py-2 text-xs font-bold sm:flex-1"
+            className="flex w-full items-center justify-center gap-2 rounded-lg border border-gray-200 px-3 py-2 text-xs font-bold sm:flex-1 cursor-pointer transition-all hover:bg-gray-50 hover:scale-105 active:scale-95"
           >
             <FcGoogle className="shrink-0" />
             Google দিয়ে চালিয়ে যান
@@ -209,7 +209,7 @@ export default function Basic() {
           <button
             type="button"
             onClick={handleGithubSignIn}
-            className="flex w-full items-center justify-center gap-2 rounded-lg border border-gray-200 px-3 py-2 text-xs font-bold sm:flex-1"
+            className="flex w-full items-center justify-center gap-2 rounded-lg border border-gray-200 px-3 py-2 text-xs font-bold sm:flex-1 cursor-pointer transition-all hover:bg-gray-50 hover:scale-105 active:scale-95"
           >
             <FaGithub className="shrink-0" />
             GitHub দিয়ে চালিয়ে যান
